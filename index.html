@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cây Hoa Đêm - 20/10</title>
+    <title>Cây Nở Hoa - 20/10</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
 
         body {
-            background: radial-gradient(circle at 20% 20%, rgba(10,12,15,0.6) 0%, rgba(0,0,0,1) 60%), linear-gradient(180deg, #071018, #0a0f10);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -29,6 +29,97 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(to top, #5d4037, #8d6e63);
+            z-index: 1;
+        }
+
+        .tree-container {
+            position: relative;
+            height: 80%;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .trunk {
+            width: 30px;
+            background: linear-gradient(to right, #5d4037, #8d6e63);
+            border-radius: 15px;
+            position: relative;
+            transform-origin: bottom;
+        }
+
+        .branch {
+            position: absolute;
+            background: linear-gradient(to right, #5d4037, #8d6e63);
+            border-radius: 8px;
+            transform-origin: bottom;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: #4caf50;
+            border-radius: 50% 0 50% 50%;
+            transform-origin: center;
+            opacity: 0;
+        }
+
+        .flower {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: brightness(1.3);
+            z-index: 10;
+        }
+
+        .petal {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffeb3b;
+            animation: petalFloat 3s ease-in-out infinite;
+        }
+
+        .flower-center {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff9800;
+            z-index: 2;
+        }
+
+        .glow {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,0,0.4) 0%, rgba(255,255,0,0) 70%);
+            opacity: 0;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffeb3b;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .message {
@@ -52,127 +143,6 @@
             opacity: 0;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             z-index: 100;
-        }
-
-        .trees-container {
-            position: relative;
-            width: 100%;
-            height: 80%;
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-end;
-        }
-
-        .tree-container {
-            position: relative;
-            height: 100%;
-            display: flex;
-            align-items: flex-end;
-        }
-
-        .trunk {
-            width: 20px;
-            background: linear-gradient(to right, #5d4037, #8d6e63);
-            border-radius: 10px;
-            position: relative;
-            transform-origin: bottom;
-            transform: scaleY(0);
-        }
-
-        .branch {
-            position: absolute;
-            background: linear-gradient(to right, #5d4037, #8d6e63);
-            border-radius: 6px;
-            transform-origin: bottom;
-        }
-
-        .leaf {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #4caf50;
-            border-radius: 50% 0 50% 50%;
-            transform-origin: center;
-            opacity: 0;
-        }
-
-        .flower {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            opacity: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            filter: brightness(1.3);
-            z-index: 10;
-        }
-
-        .petal {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ffeb3b;
-            animation: petalFloat 3s ease-in-out infinite;
-        }
-
-        .flower-center {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ff9800;
-            z-index: 2;
-        }
-
-        .glow {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,0,0.4) 0%, rgba(255,255,0,0) 70%);
-            opacity: 0;
-            animation: glowPulse 2s ease-in-out infinite;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: #ffffff;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .stars {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        .spotlight {
-            position: absolute;
-            width: 420px;
-            height: 420px;
-            left: 50%;
-            transform: translateX(-40%) translateY(-20%);
-            bottom: 10%;
-            pointer-events: none;
-            mix-blend-mode: screen;
-            filter: blur(6px);
-            clip-path: polygon(40% 0%, 100% 100%, 0% 100%);
-            background: linear-gradient(180deg, rgba(255,255,230,0.06) 0%, rgba(255,255,255,0.02) 60%, rgba(0,0,0,0) 100%);
-            opacity: 0.9;
-        }
-
-        .vignette {
-            position: absolute;
-            inset: auto 0 0 0;
-            height: 16%;
-            background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.85));
-            pointer-events: none;
         }
 
         @keyframes growTree {
@@ -243,25 +213,6 @@
                 text-shadow: 2px 2px 20px rgba(255,255,255,0.8);
             }
         }
-
-        @media (max-width: 720px) {
-            .message {
-                font-size: 2rem;
-            }
-            
-            .sub-message {
-                font-size: 1.2rem;
-            }
-            
-            .trees-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .tree-container {
-                margin-bottom: 20px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -269,38 +220,49 @@
         <div class="message">Chúc Mừng 20/10!</div>
         <div class="sub-message">Gửi đến những người phụ nữ tuyệt vời</div>
         
-        <div class="trees-container">
-            <div class="tree-container">
-                <div class="trunk" id="tree1"></div>
-            </div>
-            <div class="tree-container">
-                <div class="trunk" id="tree2"></div>
-            </div>
-            <div class="tree-container">
-                <div class="trunk" id="tree3"></div>
-            </div>
+        <div class="tree-container">
+            <div class="trunk" id="mainTrunk"></div>
         </div>
         
-        <canvas class="stars" id="stars"></canvas>
-        <div class="spotlight"></div>
-        <div class="vignette"></div>
+        <div class="ground"></div>
     </div>
 
     <script>
-        // Tạo các cây
-        function createTree(treeId, branchConfig) {
-            const trunk = document.getElementById(treeId);
-            const container = document.querySelector('.trees-container');
+        // Tạo cây chính
+        function createMainTree() {
+            const trunk = document.getElementById('mainTrunk');
+            const container = document.querySelector('.tree-container');
             
             // Đặt chiều cao thân cây
-            trunk.style.height = '400px';
+            trunk.style.height = '500px';
             
             // Tạo các cành chính
-            branchConfig.forEach((branch, index) => {
+            const mainBranches = [
+                { height: 200, rotate: -30, position: 0.7 },
+                { height: 180, rotate: 30, position: 0.6 },
+                { height: 150, rotate: -45, position: 0.5 },
+                { height: 160, rotate: 45, position: 0.4 },
+                { height: 120, rotate: -60, position: 0.3 },
+                { height: 100, rotate: 60, position: 0.2 }
+            ];
+            
+            // Tạo cành và hoa
+            mainBranches.forEach((branch, index) => {
                 setTimeout(() => {
                     createBranch(trunk, branch.height, branch.rotate, branch.position, index);
-                }, 1500 + index * 500);
+                }, 1000 + index * 300);
             });
+            
+            // Hiển thị thông điệp
+            setTimeout(() => {
+                document.querySelector('.message').style.opacity = '1';
+                document.querySelector('.message').style.transition = 'opacity 2s ease-in';
+            }, 3000);
+            
+            setTimeout(() => {
+                document.querySelector('.sub-message').style.opacity = '1';
+                document.querySelector('.sub-message').style.transition = 'opacity 2s ease-in';
+            }, 4000);
         }
         
         // Tạo cành cây
@@ -309,9 +271,9 @@
             branch.className = 'branch';
             
             branch.style.height = height + 'px';
-            branch.style.width = '12px';
+            branch.style.width = '15px';
             branch.style.left = '50%';
-            branch.style.bottom = (position * 400) + 'px';
+            branch.style.bottom = (position * 500) + 'px';
             branch.style.transform = `scaleY(0) rotate(${rotate}deg)`;
             branch.style.setProperty('--start-rotate', rotate + 'deg');
             branch.style.setProperty('--end-rotate', rotate + 'deg');
@@ -320,20 +282,20 @@
             
             // Animation mọc cành
             setTimeout(() => {
-                branch.style.transition = 'transform 2s ease-out';
+                branch.style.transition = 'transform 1.5s ease-out';
                 branch.style.transform = `scaleY(1) rotate(${rotate}deg)`;
                 
                 // Tạo lá và hoa sau khi cành mọc
                 setTimeout(() => {
                     createLeaves(branch, height);
                     createFlowers(branch, branchIndex);
-                }, 1000);
-            }, 200);
+                }, 800);
+            }, 100);
         }
         
         // Tạo lá
         function createLeaves(branch, branchHeight) {
-            const leafCount = Math.floor(branchHeight / 20);
+            const leafCount = Math.floor(branchHeight / 15);
             
             for (let i = 0; i < leafCount; i++) {
                 const leaf = document.createElement('div');
@@ -341,7 +303,7 @@
                 
                 const position = (i / leafCount) * branchHeight;
                 const side = Math.random() > 0.5 ? 1 : -1;
-                const distance = 15 + Math.random() * 25;
+                const distance = 20 + Math.random() * 30;
                 
                 leaf.style.left = (side * distance) + 'px';
                 leaf.style.top = position + 'px';
@@ -352,15 +314,15 @@
                 
                 // Animation lá xuất hiện
                 setTimeout(() => {
-                    leaf.style.transition = 'opacity 1.5s ease-in, transform 1.5s ease-in';
+                    leaf.style.transition = 'opacity 1s ease-in, transform 1s ease-in';
                     leaf.style.opacity = '1';
-                }, i * 150);
+                }, i * 100);
             }
         }
         
         // Tạo hoa
         function createFlowers(branch, branchIndex) {
-            const flowerCount = 2 + Math.floor(Math.random() * 3);
+            const flowerCount = 3 + Math.floor(Math.random() * 3);
             const flowerColors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4ecdc4', '#ff9ff3'];
             
             for (let i = 0; i < flowerCount; i++) {
@@ -370,7 +332,7 @@
                     
                     const position = 30 + Math.random() * (parseInt(branch.style.height) - 60);
                     const side = Math.random() > 0.5 ? 1 : -1;
-                    const distance = 30 + Math.random() * 30;
+                    const distance = 40 + Math.random() * 40;
                     const color = flowerColors[Math.floor(Math.random() * flowerColors.length)];
                     
                     flower.style.left = (side * distance) + 'px';
@@ -382,7 +344,7 @@
                         petal.className = 'petal';
                         
                         const angle = (j * 60) * Math.PI / 180;
-                        const petalDistance = 12;
+                        const petalDistance = 15;
                         
                         petal.style.left = (Math.cos(angle) * petalDistance) + 'px';
                         petal.style.top = (Math.sin(angle) * petalDistance) + 'px';
@@ -406,22 +368,22 @@
                     
                     // Animation hoa nở
                     setTimeout(() => {
-                        flower.style.transition = 'opacity 2s ease-in, transform 2s ease-in';
+                        flower.style.transition = 'opacity 1.5s ease-in, transform 1.5s ease-in';
                         flower.style.opacity = '1';
                         flower.style.transform = 'scale(1)';
                         
                         // Tạo hiệu ứng hạt phấn tỏa sáng
                         createPollenEffect(flower);
                         
-                    }, 300);
+                    }, 200);
                     
-                }, i * 600);
+                }, i * 400);
             }
         }
         
         // Tạo hiệu ứng hạt phấn tỏa sáng
         function createPollenEffect(flower) {
-            const particleCount = 6;
+            const particleCount = 8;
             const rect = flower.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
@@ -432,7 +394,7 @@
                     particle.className = 'particle';
                     
                     const angle = (i / particleCount) * Math.PI * 2;
-                    const distance = 60 + Math.random() * 30;
+                    const distance = 80 + Math.random() * 40;
                     const tx = Math.cos(angle) * distance;
                     const ty = Math.sin(angle) * distance;
                     
@@ -440,12 +402,12 @@
                     particle.style.top = centerY + 'px';
                     particle.style.setProperty('--tx', tx + 'px');
                     particle.style.setProperty('--ty', ty + 'px');
-                    particle.style.background = `hsl(${50 + Math.random() * 20}, 100%, 90%)`;
+                    particle.style.background = `hsl(${50 + Math.random() * 20}, 100%, 60%)`;
                     
                     document.body.appendChild(particle);
                     
                     // Animation hạt phấn
-                    particle.style.animation = `particleFloat 3s ease-out forwards`;
+                    particle.style.animation = `particleFloat 2s ease-out forwards`;
                     particle.style.animationDelay = (i * 0.1) + 's';
                     
                     // Xóa hạt phấn sau animation
@@ -453,102 +415,26 @@
                         if (particle.parentNode) {
                             particle.parentNode.removeChild(particle);
                         }
-                    }, 3000);
+                    }, 2000);
                     
-                }, i * 150);
+                }, i * 100);
             }
-        }
-        
-        // Tạo các ngôi sao nền
-        function createStars() {
-            const starsCanvas = document.getElementById('stars');
-            const ctx = starsCanvas.getContext('2d');
-            
-            function resizeCanvas() {
-                starsCanvas.width = window.innerWidth;
-                starsCanvas.height = window.innerHeight;
-                drawStars();
-            }
-            
-            function drawStars() {
-                const W = starsCanvas.width, H = starsCanvas.height;
-                ctx.clearRect(0, 0, W, H);
-                
-                // Tạo các ngôi sao nhỏ
-                for (let i = 0; i < 500; i++) {
-                    const x = Math.random() * W;
-                    const y = Math.random() * H * 0.8;
-                    const r = Math.random() * 1.5;
-                    const a = Math.random() * 0.8;
-                    ctx.fillStyle = `rgba(255, 255, 255, ${0.1 + Math.random() * 0.3})`;
-                    ctx.beginPath();
-                    ctx.arc(x, y, r, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-            
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
         }
         
         // Bắt đầu animation khi trang load
         window.onload = function() {
-            // Tạo các ngôi sao nền
-            createStars();
+            const trunk = document.getElementById('mainTrunk');
             
-            // Cấu hình các cây
-            const treeConfigs = [
-                // Cây 1
-                [
-                    { height: 150, rotate: -25, position: 0.7 },
-                    { height: 130, rotate: 25, position: 0.6 },
-                    { height: 100, rotate: -35, position: 0.4 },
-                    { height: 80, rotate: 35, position: 0.3 }
-                ],
-                // Cây 2
-                [
-                    { height: 180, rotate: -30, position: 0.7 },
-                    { height: 160, rotate: 30, position: 0.6 },
-                    { height: 120, rotate: -40, position: 0.5 },
-                    { height: 100, rotate: 40, position: 0.4 },
-                    { height: 80, rotate: -50, position: 0.2 }
-                ],
-                // Cây 3
-                [
-                    { height: 140, rotate: -20, position: 0.7 },
-                    { height: 120, rotate: 20, position: 0.6 },
-                    { height: 90, rotate: -30, position: 0.4 },
-                    { height: 70, rotate: 30, position: 0.3 }
-                ]
-            ];
-            
-            // Tạo các cây
-            const trees = ['tree1', 'tree2', 'tree3'];
-            trees.forEach((treeId, index) => {
-                const trunk = document.getElementById(treeId);
+            // Animation thân cây mọc lên
+            setTimeout(() => {
+                trunk.style.transition = 'transform 2s ease-out';
+                trunk.style.transform = 'scaleY(1)';
                 
-                // Animation thân cây mọc lên
+                // Tạo cành sau khi thân mọc
                 setTimeout(() => {
-                    trunk.style.transition = 'transform 3s ease-out';
-                    trunk.style.transform = 'scaleY(1)';
-                    
-                    // Tạo cành sau khi thân mọc
-                    setTimeout(() => {
-                        createTree(treeId, treeConfigs[index]);
-                    }, 2000);
-                }, 1000 + index * 500);
-            });
-            
-            // Hiển thị thông điệp
-            setTimeout(() => {
-                document.querySelector('.message').style.opacity = '1';
-                document.querySelector('.message').style.transition = 'opacity 2s ease-in';
-            }, 5000);
-            
-            setTimeout(() => {
-                document.querySelector('.sub-message').style.opacity = '1';
-                document.querySelector('.sub-message').style.transition = 'opacity 2s ease-in';
-            }, 6000);
+                    createMainTree();
+                }, 1500);
+            }, 500);
         };
     </script>
 </body>
