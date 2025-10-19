@@ -1,535 +1,441 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>20/10 — Cây hoa đêm</title>
-<style>
-  :root{
-    --bg1:#071018;
-    --bg2:#0a0f10;
-    --leaf-dark:#0f3a2a;
-    --leaf-mid:#145e3e;
-    --leaf-bright:#38c66f;
-    --stem-brown1:#8b5a3c;
-    --stem-brown2:#b07a52;
-    --petal1:#ff85b2;
-    --petal2:#ff5fa0;
-    --petal-edge:#ffd7ea;
-  }
-  html,body{height:100%;margin:0;background:radial-gradient(circle at 20% 20%, rgba(10,12,15,0.6) 0%, rgba(0,0,0,1) 60%), linear-gradient(180deg,var(--bg1),var(--bg2));font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;}
-  .stage{
-    position:relative;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cây Nở Hoa - 20/10</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  /* small star dots background */
-  .stars {
-    position:absolute; inset:0; pointer-events:none;
-  }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
 
-  /* triangular soft spotlight */
-  .spotlight {
-    position:absolute;
-    width:420px;
-    height:420px;
-    left:50%;
-    transform:translateX(-40%) translateY(-20%);
-    bottom:10%;
-    pointer-events:none;
-    mix-blend-mode:screen;
-    filter:blur(6px);
-    clip-path: polygon(40% 0%, 100% 100%, 0% 100%);
-    background: linear-gradient(180deg, rgba(255,255,230,0.06) 0%, rgba(255,255,255,0.02) 60%, rgba(0,0,0,0) 100%);
-    opacity:0.9;
-  }
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-  /* play triangle shape (visual only) */
-  .play-shape {
-    position:absolute;
-    left:45%;
-    transform:translateX(-50%);
-    bottom:34%;
-    width:120px;height:140px;pointer-events:none;opacity:0.06;
-    clip-path: polygon(30% 25%, 30% 75%, 80% 50%);
-    background:linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
-    filter:blur(0.6px);
-  }
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(to top, #5d4037, #8d6e63);
+            z-index: 1;
+        }
 
-  /* cluster (bush) base */
-  .bush {
-    position:absolute;
-    bottom:6%;
-    left:50%;
-    transform:translateX(-18%);
-    width:480px;
-    height:220px;
-    pointer-events:none;
-    filter:blur(0.4px) contrast(1.02);
-  }
+        .tree-container {
+            position: relative;
+            height: 80%;
+            display: flex;
+            align-items: flex-end;
+        }
 
-  /* round leaf shapes within bush are SVG drawn */
-  .grass-layer {
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:140px;
-    pointer-events:none;
-  }
+        .trunk {
+            width: 30px;
+            background: linear-gradient(to right, #5d4037, #8d6e63);
+            border-radius: 15px;
+            position: relative;
+            transform-origin: bottom;
+        }
 
-  /* single tall grass blades around */
-  .blade {
-    position:absolute;
-    bottom:6%;
-    width:8px;
-    background:linear-gradient(180deg,var(--leaf-mid),var(--leaf-dark));
-    border-radius:8px;
-    transform-origin:bottom center;
-    box-shadow:0 4px 14px rgba(20,120,50,0.14);
-    pointer-events:none;
-  }
+        .branch {
+            position: absolute;
+            background: linear-gradient(to right, #5d4037, #8d6e63);
+            border-radius: 8px;
+            transform-origin: bottom;
+        }
 
-  /* three plant containers for stems & flowers */
-  .plant {
-    position:absolute;
-    bottom:6%;
-    width:1px;height:1px; /* acts as anchor */
-    pointer-events:none;
-  }
+        .leaf {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: #4caf50;
+            border-radius: 50% 0 50% 50%;
+            transform-origin: center;
+            opacity: 0;
+        }
 
-  /* stem drawn by CSS (visual) but animated by JS controlling height & tilt */
-  .stem {
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:6px;
-    height:0;
-    transform-origin:bottom center;
-    border-radius:6px;
-    background:linear-gradient(180deg,var(--stem-brown2),var(--stem-brown1));
-    box-shadow:0 8px 18px rgba(0,0,0,0.45), inset 0 -6px 12px rgba(255,200,170,0.03);
-    transition:height 1.2s cubic-bezier(.2,.9,.28,1), transform 0.4s ease;
-  }
+        .flower {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: brightness(1.3);
+            z-index: 10;
+        }
 
-  /* simple small side leaf on stem */
-  .stem .smallleaf{
-    position:absolute; width:26px; height:14px; border-radius:50% 50% 50% 50%; bottom:60%;
-    left:-18px; background:linear-gradient(90deg,var(--leaf-mid), var(--leaf-bright)); opacity:0;
-    transform-origin:left center; transform:rotate(-20deg) scale(.6);
-    box-shadow:0 6px 18px rgba(0,0,0,0.4);
-  }
+        .petal {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffeb3b;
+            animation: petalFloat 3s ease-in-out infinite;
+        }
 
-  /* flower container */
-  .flower {
-    position:absolute;
-    bottom:100%;
-    left:50%;
-    transform:translateX(-50%) translateY(6px) scale(0.85);
-    width:120px;
-    height:120px;
-    pointer-events:none;
-    opacity:0;
-    transition:opacity .8s ease, transform .9s cubic-bezier(.18,.9,.25,1);
-  }
+        .flower-center {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff9800;
+            z-index: 2;
+        }
 
-  /* pink petals are drawn with border-radius */
-  .petal {
-    position:absolute;
-    width:46px;height:32px;
-    border-radius:60% 60% 30% 30%;
-    transform-origin:50% 80%;
-    background: radial-gradient(circle at 30% 20%, var(--petal-edge) 0%, var(--petal1) 30%, var(--petal2) 100%);
-    box-shadow:0 10px 20px rgba(255,80,160,0.12), inset 0 -6px 12px rgba(255,255,255,0.06);
-    filter:drop-shadow(0 6px 12px rgba(0,0,0,0.35));
-  }
+        .glow {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,0,0.4) 0%, rgba(255,255,0,0) 70%);
+            opacity: 0;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
 
-  .petal.p0{ left:37px; top:6px; transform: rotate(-42deg) translateY(-4px);}
-  .petal.p1{ left:15px; top:12px; transform: rotate(0deg);}
-  .petal.p2{ left:60px; top:12px; transform: rotate(42deg);}
-  .petal.p3{ left:8px; top:30px; width:30px;height:22px; transform: rotate(100deg);}
-  .petal.p4{ left:74px; top:30px; width:30px;height:22px; transform: rotate(80deg);}
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ffeb3b;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  .flower .center {
-    position:absolute; left:46px; top:42px; width:28px;height:18px;border-radius:14px;
-    background:radial-gradient(circle at 40% 40%, #fffecf 0%, #ffd56f 30%, #ffb84d 100%);
-    box-shadow:0 4px 14px rgba(255,200,80,0.22);
-    filter:blur(0.2px);
-  }
+        .message {
+            position: absolute;
+            top: 50px;
+            text-align: center;
+            color: white;
+            font-size: 3rem;
+            opacity: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 100;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
 
-  /* glowing pollen particle container */
-  .glow-pulse {
-    position:absolute; left:20%; bottom:230px; width:0;height:0; pointer-events:none;
-    filter:blur(8px);
-  }
+        .sub-message {
+            position: absolute;
+            top: 120px;
+            text-align: center;
+            color: #ffeb3b;
+            font-size: 1.5rem;
+            opacity: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
 
-  /* animation helper classes will be toggled by JS */
-  .grown { opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
-  .leaf-appear { animation:leafAppear .9s ease both; }
-  @keyframes leafAppear { from{opacity:0; transform:translateX(-6px) scale(.6)} to{opacity:1; transform:translateX(0) scale(1)} }
+        @keyframes growTree {
+            0% {
+                transform: scaleY(0);
+            }
+            100% {
+                transform: scaleY(1);
+            }
+        }
 
-  /* grass blades group (foreground) */
-  .foreground-grass { position:absolute; bottom:6%; left:8%; width:84%; height:220px; pointer-events:none; }
-  .gblade{
-    position:absolute; bottom:0; width:6px; border-radius:6px; transform-origin:bottom center;
-    background: linear-gradient(180deg, rgba(50,200,110,1), rgba(12,70,30,0.95));
-    box-shadow:0 6px 16px rgba(0,0,0,0.45);
-  }
+        @keyframes growBranch {
+            0% {
+                transform: scaleY(0) rotate(var(--start-rotate));
+            }
+            100% {
+                transform: scaleY(1) rotate(var(--end-rotate));
+            }
+        }
 
-  /* small glow dots that float around flowers */
-  .spark {
-    position:absolute; width:8px; height:8px; border-radius:50%; background: radial-gradient(circle,#fff59d,#ffe082);
-    pointer-events:none; filter:blur(0.6px); opacity:0;
-    transform:translate(-50%,-50%) scale(.6);
-  }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
 
-  /* subtle vignette bottom */
-  .vignette {
-    position:absolute; inset:auto 0 0 0; height:16%; background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.85));
-    pointer-events:none;
-  }
+        @keyframes glowPulse {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
 
-  /* responsive tweaks */
-  @media (max-width:720px){
-    .bush{width:320px;height:160px; left:50%; transform:translateX(-26%);}
-    .spotlight{width:320px;height:320px; left:48%; transform:translateX(-44%) translateY(-18%);}
-  }
-</style>
+        @keyframes petalFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        @keyframes textGlow {
+            0% {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+            100% {
+                text-shadow: 2px 2px 20px rgba(255,255,255,0.8);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="stage" id="stage">
-    <canvas id="stars" class="stars"></canvas>
-
-    <div class="spotlight" id="spotlight"></div>
-    <div class="play-shape" aria-hidden="true"></div>
-
-    <!-- bush cluster (SVG circles to emulate round leaf bunch) -->
-    <div class="bush" id="bush">
-      <svg viewBox="0 0 480 220" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" style="overflow:visible; filter:blur(0.2px)">
-        <!-- multiple rounded circles to create the plump bushes -->
-        <defs>
-          <radialGradient id="gLeaf" cx="35%" cy="30%">
-            <stop offset="0%" stop-color="#46c373" stop-opacity="0.85"/>
-            <stop offset="55%" stop-color="#11884a" stop-opacity="1"/>
-            <stop offset="100%" stop-color="#072a19" stop-opacity="1"/>
-          </radialGradient>
-          <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur stdDeviation="6" result="b"/>
-            <feBlend in="SourceGraphic" in2="b"/>
-          </filter>
-        </defs>
-
-        <!-- back bulbs -->
-        <g filter="url(#soft)">
-          <ellipse cx="80" cy="160" rx="36" ry="28" fill="url(#gLeaf)" opacity="0.95"/>
-          <ellipse cx="130" cy="150" rx="46" ry="36" fill="url(#gLeaf)" opacity="0.96"/>
-          <ellipse cx="200" cy="140" rx="62" ry="48" fill="url(#gLeaf)" opacity="0.98"/>
-          <ellipse cx="280" cy="150" rx="52" ry="40" fill="url(#gLeaf)" opacity="0.96"/>
-          <ellipse cx="340" cy="160" rx="36" ry="28" fill="url(#gLeaf)" opacity="0.95"/>
-
-          <!-- front small round leaves overlapping -->
-          <ellipse cx="170" cy="185" rx="36" ry="30" fill="url(#gLeaf)"/>
-          <ellipse cx="210" cy="185" rx="46" ry="36" fill="url(#gLeaf)"/>
-          <ellipse cx="250" cy="190" rx="40" ry="32" fill="url(#gLeaf)"/>
-          <ellipse cx="300" cy="188" rx="30" ry="24" fill="url(#gLeaf)"/>
-        </g>
-
-        <!-- a few taller thin leaf shapes as background -->
-        <path d="M30 140 C 50 80, 70 40, 90 10" stroke="#0b6f3b" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.9"/>
-        <path d="M400 140 C 380 80, 370 40, 360 10" stroke="#0b6f3b" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.9"/>
-      </svg>
+    <div class="container">
+        <div class="message">Chúc Mừng 20/10!</div>
+        <div class="sub-message">Gửi đến những người phụ nữ tuyệt vời</div>
+        
+        <div class="tree-container">
+            <div class="trunk" id="mainTrunk"></div>
+        </div>
+        
+        <div class="ground"></div>
     </div>
 
-    <!-- tall grasses left & right (separate dom elements for sway) -->
-    <div id="grass-left" style="position:absolute; left:30%; bottom:6%; height:260px; width:140px; pointer-events:none;">
-      <div class="blade" style="height:220px; left:20px; transform:rotate(-6deg);"></div>
-      <div class="blade" style="height:180px; left:70px; transform:rotate(-2deg);"></div>
-    </div>
-
-    <div id="grass-right" style="position:absolute; left:66%; bottom:6%; height:260px; width:140px; pointer-events:none;">
-      <div class="blade" style="height:210px; left:40px; transform:rotate(6deg);"></div>
-      <div class="blade" style="height:170px; left:90px; transform:rotate(3deg);"></div>
-    </div>
-
-    <!-- three plant anchors -->
-    <div class="plant" id="plant1" style="left:50%; transform:translateX(-18%);"></div>
-    <div class="plant" id="plant2" style="left:56%;"></div>
-    <div class="plant" id="plant3" style="left:62%; transform:translateX(8%);"></div>
-
-    <!-- foreground grasses (many small blades) -->
-    <div class="foreground-grass" id="fgGrass"></div>
-
-    <!-- sparkle container (DOM sparks) -->
-    <div id="sparks" style="position:absolute; pointer-events:none; inset:0;"></div>
-
-    <div class="vignette"></div>
-  </div>
-
-<script>
-/* ========= setup canvas stars ========== */
-const starsCanvas = document.getElementById('stars');
-const Sctx = starsCanvas.getContext('2d');
-function fitCanvas() {
-  starsCanvas.width = window.innerWidth;
-  starsCanvas.height = window.innerHeight;
-  drawStars();
-}
-window.addEventListener('resize', fitCanvas);
-function drawStars(){
-  const W = starsCanvas.width, H = starsCanvas.height;
-  Sctx.clearRect(0,0,W,H);
-  // layered subtle small dots
-  for(let i=0;i<700;i++){
-    const x = Math.random()*W, y = Math.random()*H*0.8;
-    const r = Math.random()*1.2;
-    const a = Math.random()*0.9;
-    Sctx.fillStyle = `rgba(255,255,255,${0.04 + Math.random()*0.18})`;
-    Sctx.beginPath(); Sctx.arc(x,y,r,0,Math.PI*2); Sctx.fill();
-  }
-}
-fitCanvas();
-
-/* ========= create stems + flowers as DOM, animate growth ========= */
-function createPlant(anchorId, stemHeight, bloomDelay){
-  const anchor = document.getElementById(anchorId);
-  // stem element
-  const stem = document.createElement('div');
-  stem.className = 'stem';
-  stem.style.height = '0px';
-  // small side leaf
-  const smallLeaf = document.createElement('div'); smallLeaf.className='smallleaf';
-  stem.appendChild(smallLeaf);
-  anchor.appendChild(stem);
-
-  // flower DOM
-  const flower = document.createElement('div');
-  flower.className='flower';
-  // petal five pieces to match image shape
-  for(let i=0;i<5;i++){
-    const pet = document.createElement('div'); pet.className='petal p'+i;
-    // add subtle rotation animation (sway) using CSS transform will be updated by JS
-    pet.style.transition = 'transform 0.6s ease-in-out';
-    flower.appendChild(pet);
-  }
-  const center = document.createElement('div'); center.className='center';
-  flower.appendChild(center);
-  anchor.appendChild(flower);
-
-  // make a few leaf shapes along the stem (small flat leaves rotated)
-  const leafCount = 4;
-  for(let i=0;i<leafCount;i++){
-    const l = document.createElement('div');
-    l.className='smallleaf';
-    l.style.bottom = `${Math.round((i+1)*(stemHeight/ (leafCount+1)) - 20)}px`;
-    l.style.left = (i%2===0? '-22px' : '8px');
-    l.style.setProperty('--angle', (i%2===0? '-18deg' : '18deg'));
-    l.style.transition = 'opacity .9s ease, transform .9s ease';
-    anchor.appendChild(l);
-  }
-
-  // store objects for animation
-  return { anchor, stem, flower, smallLeaf, stemHeight, bloomDelay };
-}
-
-/* three plants : heights tuned to match image */
-const p1 = createPlant('plant1', 230, 2200);
-const p2 = createPlant('plant2', 300, 2600);
-const p3 = createPlant('plant3', 260, 2400);
-const plants = [p1,p2,p3];
-
-/* animate growth timeline:
-   1) grow stems (increase height)
-   2) reveal small leaves along stem
-   3) show flower (bloom), petals scale + glow particles
-   4) then create foreground grasses
-*/
-
-function setStemHeight(obj, h){
-  obj.stem.style.height = h + 'px';
-}
-
-function appearLeafElems(anchor){
-  const nodes = anchor.querySelectorAll('.smallleaf');
-  nodes.forEach((n, idx)=>{
-    setTimeout(()=>{ n.style.opacity=1; n.style.transform='rotate('+ (idx%2?18:-18) +'deg) scale(1)'; }, idx*140);
-  });
-}
-
-// bloom function: show flower and animate petals sway lightly
-function bloom(obj){
-  obj.flower.classList.add('grown');
-  obj.flower.style.opacity = 1;
-  obj.flower.style.transform = 'translateX(-50%) translateY(0) scale(1)';
-  // petals gentle swing loop using JS
-  const petals = obj.flower.querySelectorAll('.petal');
-  let base = 0;
-  function petalAnim(){
-    base += 0.02;
-    petals.forEach((pet,i)=>{
-      const sway = Math.sin(base + i*0.9)*6; // degrees
-      pet.style.transform = pet.style.transform.replace(/rotate\([^)]+\)/,'') + ` rotate(${sway}deg)`;
-    });
-    obj._petalInterval = requestAnimationFrame(petalAnim);
-  }
-  petalAnim();
-
-  // small glow sparkles around flower (DOM sparks)
-  spawnSparks(obj.anchor, 12);
-}
-
-/* spawn small yellow glow dots near anchor (positioned relative) */
-function spawnSparks(anchor, n){
-  const sparksRoot = document.getElementById('sparks');
-  const rect = anchor.getBoundingClientRect();
-  for(let i=0;i<n;i++){
-    const s = document.createElement('div'); s.className='spark';
-    const x = rect.left + rect.width/2 + (Math.random()*120 - 60);
-    const y = rect.top - (Math.random()*60 + 40);
-    s.style.left = x + 'px'; s.style.top = y + 'px';
-    s.style.opacity = 0;
-    s.style.transition = `opacity 400ms ease ${Math.random()*200}ms, transform ${1200 + Math.random()*1000}ms cubic-bezier(.2,.9,.2,1)`;
-    sparksRoot.appendChild(s);
-    // animate
-    setTimeout(()=>{ s.style.opacity = 1; s.style.transform = `translateY(-${40 + Math.random()*80}px) scale(${0.6 + Math.random()*0.9})`; },20 + Math.random()*200);
-    // fade out then remove
-    setTimeout(()=>{ s.style.opacity = 0; }, 1200 + Math.random()*900);
-    setTimeout(()=>{ if(s.parentNode) s.parentNode.removeChild(s); }, 2200 + Math.random()*1000);
-  }
-}
-
-/* grass creation foreground */
-function createForegroundGrass(){
-  const fg = document.getElementById('fgGrass');
-  const W = fg.clientWidth || window.innerWidth;
-  // generate many small blades
-  for(let i=0;i<40;i++){
-    const b = document.createElement('div'); b.className='gblade';
-    const left = Math.random()*100;
-    const h = 20 + Math.random()*120;
-    b.style.left = left + '%';
-    b.style.height = h + 'px';
-    b.style.transform = `rotate(${Math.random()*12-6}deg)`;
-    b.style.opacity = 0;
-    b.style.transition = 'opacity 800ms ease, transform 1.2s ease';
-    fg.appendChild(b);
-    setTimeout(()=>{ b.style.opacity = 1; }, 1400 + i*30);
-  }
-}
-
-/* choreograph timeline */
-function startSequence(){
-  // grow stems slowly
-  plants.forEach((p, idx)=>{
-    setTimeout(()=>{
-      // animate height gradually
-      let cur=0;
-      const target = p.stemHeight;
-      const step = Math.max(2, Math.round(target/22));
-      const growLoop = setInterval(()=>{
-        cur += step;
-        if(cur >= target){ cur = target; clearInterval(growLoop); }
-        setStemHeight(p, cur);
-      }, 40);
-      // small leaves appear after stem mostly grown
-      setTimeout(()=>{ appearLeafElems(p.anchor); }, 900 + idx*200);
-      // bloom
-      setTimeout(()=>{ bloom(p); }, p.bloomDelay);
-    }, idx*220);
-  });
-
-  // foreground grass appears after a bit
-  setTimeout(()=>{ createForegroundGrass(); }, 2400);
-
-  // animate tall background blades sway (CSS keyframe-like via JS)
-  animateSway();
-}
-
-/* continuous gentle sway for blades, stems and entire plants */
-function animateSway(){
-  const blades = document.querySelectorAll('.blade, .gblade');
-  const plantsDom = document.querySelectorAll('.plant');
-  let t=0;
-  function sway(){
-    t += 0.016;
-    blades.forEach((b,i)=>{
-      const amp = (b.classList.contains('blade')? 6 : 3) + Math.random()*1;
-      const freq = 0.7 + (i%5)*0.02;
-      const r = Math.sin(t*freq + i)*amp;
-      b.style.transform = `rotate(${r}deg)`;
-    });
-    // plants (rotate slightly around bottom to emulate group sway)
-    plants.forEach((p, i)=>{
-      const amp = 3 + i*0.8;
-      const freq = 0.5 + i*0.05;
-      const r = Math.sin(t*freq + i*1.3) * amp;
-      p.anchor.style.transform = `translateX(${p.anchor.style.left || 0}) translateY(0) rotate(${r}deg)`;
-      // also tilt stems subtly
-      p.stem.style.transform = `rotate(${r*0.4}deg)`;
-    });
-    requestAnimationFrame(sway);
-  }
-  sway();
-}
-
-/* paint some very subtle moving particles above flowers (canvas overlay) */
-const canvasOverlay = document.createElement('canvas');
-canvasOverlay.style.position='absolute'; canvasOverlay.style.left=0; canvasOverlay.style.top=0;
-canvasOverlay.width = window.innerWidth; canvasOverlay.height = window.innerHeight;
-canvasOverlay.style.pointerEvents='none';
-document.getElementById('stage').appendChild(canvasOverlay);
-const C = canvasOverlay.getContext('2d');
-
-function resizeOverlay(){
-  canvasOverlay.width = window.innerWidth; canvasOverlay.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeOverlay);
-
-let particles = [];
-function spawnFloatingParticles(){
-  // spawn near each flower
-  plants.forEach(p=>{
-    const a = p.anchor.getBoundingClientRect();
-    if(a.width===0 && a.height===0){
-      // anchors might be 0 size before layout; compute approximate positions
-    }
-    const px = a.left + a.width/2 + (Math.random()*60-30);
-    const py = a.top - 40 + (Math.random()*20-10);
-    particles.push({
-      x:px, y:py,
-      vx: (Math.random()*1.2-0.6), vy: - (1+Math.random()*1.2),
-      life: 180 + Math.random()*120,
-      col: 'rgba(255,236,135,' + (0.5 + Math.random()*0.6) + ')',
-      size: 3+Math.random()*5
-    });
-  });
-}
-
-function updateParticles(){
-  C.clearRect(0,0,canvasOverlay.width, canvasOverlay.height);
-  for(let i=particles.length-1;i>=0;i--){
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy;
-    p.vy -= 0.01 * Math.random(); // slight upward slow
-    p.life--;
-    if(p.life<=0){ particles.splice(i,1); continue; }
-    C.beginPath();
-    C.fillStyle = p.col;
-    C.arc(p.x,p.y,p.size * (p.life/220 + 0.2), 0, Math.PI*2);
-    C.fill();
-  }
-  // occasionally spawn
-  if(Math.random() < 0.05) spawnFloatingParticles();
-  requestAnimationFrame(updateParticles);
-}
-
-/* kick off everything when DOM is ready and layout stable */
-window.addEventListener('load', ()=>{
-  // small initial delay for nicer timing
-  setTimeout(()=>{ startSequence(); updateParticles(); }, 300);
-});
-
-</script>
+    <script>
+        // Tạo cây chính
+        function createMainTree() {
+            const trunk = document.getElementById('mainTrunk');
+            const container = document.querySelector('.tree-container');
+            
+            // Đặt chiều cao thân cây
+            trunk.style.height = '500px';
+            
+            // Tạo các cành chính
+            const mainBranches = [
+                { height: 200, rotate: -30, position: 0.7 },
+                { height: 180, rotate: 30, position: 0.6 },
+                { height: 150, rotate: -45, position: 0.5 },
+                { height: 160, rotate: 45, position: 0.4 },
+                { height: 120, rotate: -60, position: 0.3 },
+                { height: 100, rotate: 60, position: 0.2 }
+            ];
+            
+            // Tạo cành và hoa
+            mainBranches.forEach((branch, index) => {
+                setTimeout(() => {
+                    createBranch(trunk, branch.height, branch.rotate, branch.position, index);
+                }, 1000 + index * 300);
+            });
+            
+            // Hiển thị thông điệp
+            setTimeout(() => {
+                document.querySelector('.message').style.opacity = '1';
+                document.querySelector('.message').style.transition = 'opacity 2s ease-in';
+            }, 3000);
+            
+            setTimeout(() => {
+                document.querySelector('.sub-message').style.opacity = '1';
+                document.querySelector('.sub-message').style.transition = 'opacity 2s ease-in';
+            }, 4000);
+        }
+        
+        // Tạo cành cây
+        function createBranch(trunk, height, rotate, position, branchIndex) {
+            const branch = document.createElement('div');
+            branch.className = 'branch';
+            
+            branch.style.height = height + 'px';
+            branch.style.width = '15px';
+            branch.style.left = '50%';
+            branch.style.bottom = (position * 500) + 'px';
+            branch.style.transform = `scaleY(0) rotate(${rotate}deg)`;
+            branch.style.setProperty('--start-rotate', rotate + 'deg');
+            branch.style.setProperty('--end-rotate', rotate + 'deg');
+            
+            trunk.appendChild(branch);
+            
+            // Animation mọc cành
+            setTimeout(() => {
+                branch.style.transition = 'transform 1.5s ease-out';
+                branch.style.transform = `scaleY(1) rotate(${rotate}deg)`;
+                
+                // Tạo lá và hoa sau khi cành mọc
+                setTimeout(() => {
+                    createLeaves(branch, height);
+                    createFlowers(branch, branchIndex);
+                }, 800);
+            }, 100);
+        }
+        
+        // Tạo lá
+        function createLeaves(branch, branchHeight) {
+            const leafCount = Math.floor(branchHeight / 15);
+            
+            for (let i = 0; i < leafCount; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                
+                const position = (i / leafCount) * branchHeight;
+                const side = Math.random() > 0.5 ? 1 : -1;
+                const distance = 20 + Math.random() * 30;
+                
+                leaf.style.left = (side * distance) + 'px';
+                leaf.style.top = position + 'px';
+                leaf.style.background = `hsl(${120 + Math.random() * 30}, 70%, ${40 + Math.random() * 20}%)`;
+                leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                branch.appendChild(leaf);
+                
+                // Animation lá xuất hiện
+                setTimeout(() => {
+                    leaf.style.transition = 'opacity 1s ease-in, transform 1s ease-in';
+                    leaf.style.opacity = '1';
+                }, i * 100);
+            }
+        }
+        
+        // Tạo hoa
+        function createFlowers(branch, branchIndex) {
+            const flowerCount = 3 + Math.floor(Math.random() * 3);
+            const flowerColors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4ecdc4', '#ff9ff3'];
+            
+            for (let i = 0; i < flowerCount; i++) {
+                setTimeout(() => {
+                    const flower = document.createElement('div');
+                    flower.className = 'flower';
+                    
+                    const position = 30 + Math.random() * (parseInt(branch.style.height) - 60);
+                    const side = Math.random() > 0.5 ? 1 : -1;
+                    const distance = 40 + Math.random() * 40;
+                    const color = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+                    
+                    flower.style.left = (side * distance) + 'px';
+                    flower.style.top = position + 'px';
+                    
+                    // Tạo cánh hoa
+                    for (let j = 0; j < 6; j++) {
+                        const petal = document.createElement('div');
+                        petal.className = 'petal';
+                        
+                        const angle = (j * 60) * Math.PI / 180;
+                        const petalDistance = 15;
+                        
+                        petal.style.left = (Math.cos(angle) * petalDistance) + 'px';
+                        petal.style.top = (Math.sin(angle) * petalDistance) + 'px';
+                        petal.style.background = color;
+                        petal.style.animationDelay = (j * 0.2) + 's';
+                        
+                        flower.appendChild(petal);
+                    }
+                    
+                    // Tạo nhụy hoa
+                    const center = document.createElement('div');
+                    center.className = 'flower-center';
+                    flower.appendChild(center);
+                    
+                    // Tạo hiệu ứng tỏa sáng
+                    const glow = document.createElement('div');
+                    glow.className = 'glow';
+                    flower.appendChild(glow);
+                    
+                    branch.appendChild(flower);
+                    
+                    // Animation hoa nở
+                    setTimeout(() => {
+                        flower.style.transition = 'opacity 1.5s ease-in, transform 1.5s ease-in';
+                        flower.style.opacity = '1';
+                        flower.style.transform = 'scale(1)';
+                        
+                        // Tạo hiệu ứng hạt phấn tỏa sáng
+                        createPollenEffect(flower);
+                        
+                    }, 200);
+                    
+                }, i * 400);
+            }
+        }
+        
+        // Tạo hiệu ứng hạt phấn tỏa sáng
+        function createPollenEffect(flower) {
+            const particleCount = 8;
+            const rect = flower.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const distance = 80 + Math.random() * 40;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    particle.style.setProperty('--tx', tx + 'px');
+                    particle.style.setProperty('--ty', ty + 'px');
+                    particle.style.background = `hsl(${50 + Math.random() * 20}, 100%, 60%)`;
+                    
+                    document.body.appendChild(particle);
+                    
+                    // Animation hạt phấn
+                    particle.style.animation = `particleFloat 2s ease-out forwards`;
+                    particle.style.animationDelay = (i * 0.1) + 's';
+                    
+                    // Xóa hạt phấn sau animation
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 2000);
+                    
+                }, i * 100);
+            }
+        }
+        
+        // Bắt đầu animation khi trang load
+        window.onload = function() {
+            const trunk = document.getElementById('mainTrunk');
+            
+            // Animation thân cây mọc lên
+            setTimeout(() => {
+                trunk.style.transition = 'transform 2s ease-out';
+                trunk.style.transform = 'scaleY(1)';
+                
+                // Tạo cành sau khi thân mọc
+                setTimeout(() => {
+                    createMainTree();
+                }, 1500);
+            }, 500);
+        };
+    </script>
 </body>
 </html>
